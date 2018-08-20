@@ -47,14 +47,15 @@ class LaravelProjectServiceProvider extends ServiceProvider
     public function register()
     {
         $this->commands(
-            'Bmadeiro\LaravelProject\Commands\CrudCommand',
-            'Bmadeiro\LaravelProject\Commands\CrudControllerCommand',
-            'Bmadeiro\LaravelProject\Commands\CrudModelCommand',
-            'Bmadeiro\LaravelProject\Commands\CrudMigrationCommand',
-            'Bmadeiro\LaravelProject\Commands\CrudViewCommand',
-            'Bmadeiro\LaravelProject\Commands\CrudLangCommand',
-            'Bmadeiro\LaravelProject\Commands\CrudApiCommand',
-            'Bmadeiro\LaravelProject\Commands\CrudApiControllerCommand'
+            'Bmadeiro\LaravelProject\Commands\CreateCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateProjectCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateControllerCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateModelCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateMigrationCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateViewCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateLangCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateApiCommand',
+            'Bmadeiro\LaravelProject\Commands\CreateApiControllerCommand'
         );
     }
 }

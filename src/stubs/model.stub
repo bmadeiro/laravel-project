@@ -1,26 +1,45 @@
-<?php
+<?php 
 
-namespace DummyNamespace;
+namespace $NAMESPACE_MODEL$;
 
 use Illuminate\Database\Eloquent\Model;
-{{useSoftDeletes}}
-class DummyClass extends Model
+
+use $NAMESPACE_MODEL_EXTEND$;
+$IMPORT_TRAIT$
+class $MODEL_NAME$ extends Model$AUTH_IMPLEMENTS$
 {
-    {{softDeletes}}/**
+    /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = '{{table}}';
-
-    {{primaryKey}}
-
+    public $table = "$TABLE_NAME$";
+    
     /**
-     * Attributes that should be mass-assignable.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = {{fillable}};
+    public $fillable = [
+        $FIELDS$
+    ];
 
-    {{relationships}}
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        $CAST$
+    ];
+
+    /**
+     * The rules that is used to validate.
+     *
+     * @var array
+     */
+    public static $rules = [
+        $RULES$
+    ];
+    $RELATIONSHIPS$
 }

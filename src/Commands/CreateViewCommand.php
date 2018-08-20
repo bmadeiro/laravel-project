@@ -5,7 +5,7 @@ namespace Bmadeiro\LaravelProject\Commands;
 use File;
 use Illuminate\Console\Command;
 
-class CrudViewCommand extends Command
+class CreateViewCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -127,7 +127,7 @@ class CrudViewCommand extends Command
     protected $varName = '';
 
     /**
-     * Name of the Crud.
+     * Name of the Create.
      *
      * @var string
      */

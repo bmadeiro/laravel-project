@@ -4,24 +4,29 @@ namespace Bmadeiro\LaravelProject\Commands;
 
 use Illuminate\Console\Command;
 
-class CrudControllerCommand extends Command
+class CreateApiControllerCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'create:controller
-                            {--route-group= : Prefix of the route group.}
+    protected $signature = 'create:api-controller
+                            {name : The name of the controler.}
+                            {--crud-name= : The name of the Create.}
+                            {--model-name= : The name of the Model.}
+                            {--model-namespace= : The namespace of the Model.}
+                            {--controller-namespace= : Namespace of the controller.}
+                            {--validations= : Validation rules for the fields.}
                             {--pagination=25 : The amount of models per page for index pages.}
-                            {--force=yes : Overwrite already existing controller.}';
+                            {--force : Overwrite already existing controller.}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new resource controller.';
+    protected $description = 'Create a new api controller.';
 
     /**
      * The type of class being generated.
@@ -39,7 +44,7 @@ class CrudControllerCommand extends Command
     {
         return config('generator.custom_template')
         ? config('generator.path') . '/controller.stub'
-        : __DIR__ . '/../stubs/controller.stub';
+        : __DIR__ . '/../stubs/api-controller.stub';
     }
 
     /**
@@ -79,17 +84,11 @@ class CrudControllerCommand extends Command
     {
         $stub = $this->files->get($this->getStub());
 
-        $viewPath = $this->option('view-path') ? $this->option('view-path') . '.' : '';
         $crudName = strtolower($this->option('crud-name'));
         $crudNameSingular = str_singular($crudName);
         $modelName = $this->option('model-name');
         $modelNamespace = $this->option('model-namespace');
-        $routeGroup = ($this->option('route-group')) ? $this->option('route-group') . '/' : '';
-        $routePrefix = ($this->option('route-group')) ? $this->option('route-group') : '';
-        $routePrefixCap = ucfirst($routePrefix);
         $perPage = intval($this->option('pagination'));
-        $viewName = snake_case($this->option('crud-name'), '-');
-        $fields = $this->option('fields');
         $validations = rtrim($this->option('validations'), ';');
 
         $validationRules = '';
@@ -113,93 +112,15 @@ class CrudControllerCommand extends Command
             $validationRules .= "\n\t\t]);";
         }
 
-        if (\App::VERSION() < '5.3') {
-            $snippet = <<<EOD
-        if (\$request->hasFile('{{fieldName}}')) {
-            \$file = \$request->file('{{fieldName}}');
-            \$fileName = str_random(40) . '.' . \$file->getClientOriginalExtension();
-            \$destinationPath = storage_path('/app/public/uploads');
-            \$file->move(\$destinationPath, \$fileName);
-            \$requestData['{{fieldName}}'] = 'uploads/' . \$fileName;
-        }
-EOD;
-        } else {
-            $snippet = <<<EOD
-        if (\$request->hasFile('{{fieldName}}')) {
-            \$requestData['{{fieldName}}'] = \$request->file('{{fieldName}}')
-                ->store('uploads', 'public');
-        }
-EOD;
-        }
-
-
-        $fieldsArray = explode(';', $fields);
-        $fileSnippet = '';
-        $whereSnippet = '';
-
-        if ($fields) {
-            $x = 0;
-            foreach ($fieldsArray as $index => $item) {
-                $itemArray = explode('#', $item);
-
-                if (trim($itemArray[1]) == 'file') {
-                    $fileSnippet .= str_replace('{{fieldName}}', trim($itemArray[0]), $snippet) . "\n";
-                }
-
-                $fieldName = trim($itemArray[0]);
-
-                $whereSnippet .= ($index == 0) ? "where('$fieldName', 'LIKE', \"%\$keyword%\")" . "\n                " : "->orWhere('$fieldName', 'LIKE', \"%\$keyword%\")" . "\n                ";
-            }
-
-            $whereSnippet .= "->";
-        }
-
         return $this->replaceNamespace($stub, $name)
-            ->replaceViewPath($stub, $viewPath)
-            ->replaceViewName($stub, $viewName)
             ->replaceCrudName($stub, $crudName)
             ->replaceCrudNameSingular($stub, $crudNameSingular)
             ->replaceModelName($stub, $modelName)
             ->replaceModelNamespace($stub, $modelNamespace)
             ->replaceModelNamespaceSegments($stub, $modelNamespace)
-            ->replaceRouteGroup($stub, $routeGroup)
-            ->replaceRoutePrefix($stub, $routePrefix)
-            ->replaceRoutePrefixCap($stub, $routePrefixCap)
             ->replaceValidationRules($stub, $validationRules)
             ->replacePaginationNumber($stub, $perPage)
-            ->replaceFileSnippet($stub, $fileSnippet)
-            ->replaceWhereSnippet($stub, $whereSnippet)
             ->replaceClass($stub, $name);
-    }
-
-    /**
-     * Replace the viewName fo the given stub.
-     *
-     * @param string $stub
-     * @param string $viewName
-     *
-     * @return $this
-     */
-    protected function replaceViewName(&$stub, $viewName)
-    {
-        $stub = str_replace('{{viewName}}', $viewName, $stub);
-
-        return $this;
-    }
-
-    /**
-     * Replace the viewPath for the given stub.
-     *
-     * @param  string  $stub
-     * @param  string  $viewPath
-     *
-     * @return $this
-     */
-    protected function replaceViewPath(&$stub, $viewPath)
-    {
-        $stub = str_replace('{{viewPath}}', $viewPath, $stub);
-
-        return $this;
     }
 
     /**
@@ -283,51 +204,6 @@ EOD;
     }
 
     /**
-     * Replace the routePrefix for the given stub.
-     *
-     * @param  string  $stub
-     * @param  string  $routePrefix
-     *
-     * @return $this
-     */
-    protected function replaceRoutePrefix(&$stub, $routePrefix)
-    {
-        $stub = str_replace('{{routePrefix}}', $routePrefix, $stub);
-
-        return $this;
-    }
-
-    /**
-     * Replace the routePrefixCap for the given stub.
-     *
-     * @param  string  $stub
-     * @param  string  $routePrefixCap
-     *
-     * @return $this
-     */
-    protected function replaceRoutePrefixCap(&$stub, $routePrefixCap)
-    {
-        $stub = str_replace('{{routePrefixCap}}', $routePrefixCap, $stub);
-
-        return $this;
-    }
-
-    /**
-     * Replace the routeGroup for the given stub.
-     *
-     * @param  string  $stub
-     * @param  string  $routeGroup
-     *
-     * @return $this
-     */
-    protected function replaceRouteGroup(&$stub, $routeGroup)
-    {
-        $stub = str_replace('{{routeGroup}}', $routeGroup, $stub);
-
-        return $this;
-    }
-
-    /**
      * Replace the validationRules for the given stub.
      *
      * @param  string  $stub
@@ -353,36 +229,6 @@ EOD;
     protected function replacePaginationNumber(&$stub, $perPage)
     {
         $stub = str_replace('{{pagination}}', $perPage, $stub);
-
-        return $this;
-    }
-
-    /**
-     * Replace the file snippet for the given stub
-     *
-     * @param $stub
-     * @param $fileSnippet
-     *
-     * @return $this
-     */
-    protected function replaceFileSnippet(&$stub, $fileSnippet)
-    {
-        $stub = str_replace('{{fileSnippet}}', $fileSnippet, $stub);
-
-        return $this;
-    }
-
-    /**
-     * Replace the where snippet for the given stub
-     *
-     * @param $stub
-     * @param $whereSnippet
-     *
-     * @return $this
-     */
-    protected function replaceWhereSnippet(&$stub, $whereSnippet)
-    {
-        $stub = str_replace('{{whereSnippet}}', $whereSnippet, $stub);
 
         return $this;
     }

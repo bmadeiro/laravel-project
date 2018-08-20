@@ -5,7 +5,7 @@
 [![Latest Stable Version](https://poser.pugx.org/bmadeiro/laravel-project/v/stable.svg)](https://packagist.org/packages/bmadeiro/laravel-project)
 [![License](https://poser.pugx.org/bmadeiro/laravel-project/license.svg)](https://packagist.org/packages/bmadeiro/laravel-project)
 
-This package provides various initial generators (CRUD, API, Controller, Model, Migration, View) for Laravel projects.
+This package provides various initial generators (CRUD, API, Controller, Model, Migration, View) for Laravel projects from existed tables.
 
 ## Requirements
     Laravel >=5.6

@@ -13,7 +13,55 @@ return [
     |
      */
 
-    'path' => base_path('resources/crud-generator/'),
+    'path' => base_path('resources/generator/'),
+
+    
+
+    /*
+    |--------------------------------------------------------------------------
+    | Path for classes
+    |--------------------------------------------------------------------------
+    |
+    | All Classes will be created on these relevant path
+    |
+     */
+
+    'path_migration'  => base_path('database/migrations/'),
+    
+    'path_model'      => app_path('Models/'),
+    
+    'path_repository' => app_path('Repositories/'),
+    
+    'path_service'    => app_path('Services/'),
+    
+    'path_controller' => app_path('Controllers/'),
+    
+    'path_view'       => base_path('resources/views/'),
+    
+    'path_request'    => app_path('Requests/'),
+    
+    'path_route'      => app_path('routes.php'),
+    
+    'path_factory'    => base_path('database/factories/ModelFactory.php'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Namespace for classes
+    |--------------------------------------------------------------------------
+    |
+    | All Classes will be created with these namespaces
+    |
+     */
+
+    'namespace_model'      => 'Dais\Models',
+    
+    'namespace_repository' => 'Dais\Repositories',
+    
+    'namespace_service'    => 'Dais\Services',
+    
+    'namespace_controller' => 'Dais\Controllers',
+    
+    'namespace_request'    => 'Dais\Requests',
 
     /**
      * Columns number to show in view's table.

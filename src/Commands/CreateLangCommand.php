@@ -5,7 +5,7 @@ namespace Bmadeiro\LaravelProject\Commands;
 use File;
 use Illuminate\Console\Command;
 
-class CrudLangCommand extends Command
+class CreateLangCommand extends Command
 {
     /**
      * The name and signature of the console command.

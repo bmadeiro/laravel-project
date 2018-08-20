@@ -3,9 +3,8 @@
 namespace Bmadeiro\LaravelProject\Commands;
 
 use File;
-use Illuminate\Console\Command;
 
-class CrudCommand extends Command
+class CreateProjectCommand extends CreateCommand
 {
     /**
      * The name and signature of the console command.

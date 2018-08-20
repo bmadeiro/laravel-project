@@ -4,7 +4,7 @@ namespace Bmadeiro\LaravelProject\Commands;
 
 use Illuminate\Console\Command;
 
-class CrudMigrationCommand extends Command
+class CreateMigrationCommand extends Command
 {
     /**
      * The name and signature of the console command.
