@@ -1,0 +1,51 @@
+{
+    "name": "bmadeiro/laravel-project",
+    "license": "MIT",
+    "description": "Laravel New Project Generator",
+    "keywords": [
+        "laravel",
+        "project",
+        "generator",
+        "laravel new project generator",
+        "api generator"
+    ],
+    "authors": [
+        {
+            "name": "Sohel Amin",
+            "email": "sohelamincse@gmail.com",
+            "homepage": "http://www.appzcoder.com"
+        },
+        {
+            "name": "Bluecode"
+        },
+        {
+            "name": "Bruno Madeiro",
+            "email": "bmadeiro@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/support": "^5.1",
+        "laravelcollective/html": "^5.1"
+    },
+    "require-dev": {
+        "mockery/mockery": "^0.9.6",
+        "phpunit/phpunit": "^5.7",
+        "orchestra/testbench": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bmadeiro\\LaravelProject\\": "src/"
+        },
+        "classmap": [
+            "tests"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bmadeiro\\LaravelProject\\LaravelProjectServiceProvider"
+            ]
+        }
+    }
+}
