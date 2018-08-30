@@ -23,20 +23,6 @@ class LaravelProjectServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/generator.php' => config_path('generator.php'),
         ]);
-
-        $this->publishes([
-            __DIR__ . '/../publish/views/' => base_path('resources/views/'),
-        ]);
-
-        if (\App::VERSION() <= '5.2') {
-            $this->publishes([
-                __DIR__ . '/../publish/css/app.css' => public_path('css/app.css'),
-            ]);
-        }
-
-        $this->publishes([
-            __DIR__ . '/stubs/' => base_path('resources/generator/'),
-        ]);
     }
 
     /**
@@ -52,10 +38,7 @@ class LaravelProjectServiceProvider extends ServiceProvider
             'Bmadeiro\LaravelProject\Commands\CreateControllerCommand',
             'Bmadeiro\LaravelProject\Commands\CreateModelCommand',
             'Bmadeiro\LaravelProject\Commands\CreateMigrationCommand',
-            'Bmadeiro\LaravelProject\Commands\CreateViewCommand',
-            'Bmadeiro\LaravelProject\Commands\CreateLangCommand',
-            'Bmadeiro\LaravelProject\Commands\CreateApiCommand',
-            'Bmadeiro\LaravelProject\Commands\CreateApiControllerCommand'
+            'Bmadeiro\LaravelProject\Commands\CreateViewCommand'
         );
     }
 }
