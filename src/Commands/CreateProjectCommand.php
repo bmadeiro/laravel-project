@@ -8,14 +8,14 @@ use Bmadeiro\LaravelProject\Generators\RequestGenerator;
 use Bmadeiro\LaravelProject\Generators\RoutesGenerator;
 use Bmadeiro\LaravelProject\Generators\ViewGenerator;
 
-class CreateScaffoldCommand extends CreateCommand
+class CreateProjectCommand extends CreateCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'create:scaffold
+    protected $signature = 'create:project
                                 {table?} : List table name for generate scaffold.}
                                 {--tables= : List table name for generate scaffold.}
                                 {--ignore= : List ignore table name.}

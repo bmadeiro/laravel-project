@@ -1,6 +1,6 @@
 <?php
 
-namespace Peaches\Generator\Generators;
+namespace Bmadeiro\LaravelProject\Generators;
 
 class RoutesGenerator extends BaseGenerator implements GeneratorInterface
 {

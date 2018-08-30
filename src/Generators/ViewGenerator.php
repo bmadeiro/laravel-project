@@ -1,39 +1,9 @@
 <?php
 
-namespace Bmadeiro\LaravelProject\Commands;
+namespace Bmadeiro\LaravelProject\Generators;
 
-use Bmadeiro\LaravelProject\Generators\ControllerGenerator;
-use Bmadeiro\LaravelProject\Generators\ModelGenerator;
-use Bmadeiro\LaravelProject\Generators\RequestGenerator;
-use Bmadeiro\LaravelProject\Generators\RoutesGenerator;
-use Bmadeiro\LaravelProject\Generators\ViewGenerator;
-
-class CreateScaffoldCommand extends CreateCommand
+class ViewGenerator extends BaseGenerator implements GeneratorInterface
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'create:scaffold
-                                {table?} : List table name for generate view.}
-                                {--tables= : List table name for generate view.}
-                                {--ignore= : List ignore table name.}
-                                {--paginate=10 : Pagination for index.blade.php}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Create a view for given table.';
-    /**
-     * A list model name for generate
-     *
-     * @var array
-     */
-    public $models = [];
-
     /**
      * Get the type of command
      *
@@ -45,61 +15,126 @@ class CreateScaffoldCommand extends CreateCommand
     }
 
     /**
-     * Execute the command.
+     * Get the template path for generate
      *
-     * @return void
+     * @return string
      */
-    public function handle()
+    public function getTemplatePath()
     {
-        parent::handle();
+        return 'scaffold/views/';
+    }
 
-        // TODO: compare the length option
+    public function getPaginatePath()
+    {
+        return $this->templatePath . 'paginate.blade';
+    }
 
-        $configData = $this->getConfigData();
+    public function generate($data = [])
+    {
+        // set path to view folder
+        $this->rootPath = config('generator.path_view') . $data['VIEW_FOLDER_NAME'] . '/';
 
-        // get message config by locale
-        $locale = config('app.locale');
-        $configMessages = config('generator.message');
-        if (isset($configMessages[$locale])) {
-            $messages = $configMessages[$locale];
+        $this->command->comment("\nViews created: ");
+        $this->templateData = $data;
+
+        $this->generateIndex();
+        $this->generateForm();
+        $this->generateCreate();
+        $this->generateEdit();
+        $this->generateShow();
+    }
+
+    private function generateIndex()
+    {
+        $templateData = $this->templateData;
+
+        if ($this->command->option('paginate')) {
+            $templateData['PAGINATE'] = $this->generateContent($this->getPaginatePath(), $templateData);
         } else {
-            $messages = $configMessages['en'];
+            $templateData['PAGINATE'] = '';
         }
-        $configData = array_merge([
-            'MESSAGE_STORE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['store']) . "'",
-            'MESSAGE_UPDATE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['update']) . "'",
-            'MESSAGE_DELETE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['delete']) . "'",
-            'MESSAGE_NOT_FOUND' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['not_found']) . "'",
-        ], $configData);
 
-        // init generators
-        $modelGenerator = new ModelGenerator($this);
+        $headerColumns = $bodyColumns = [];
+        foreach ($this->fillableColumns as $column) {
+            $headerColumns[] = '<th>' . title_case(str_replace('_', ' ', $column['field'])) . "</th>";
 
-        $viewGenerator = new ViewGenerator($this);
+            $bodyColumns[] = '<td>{!! $' . $templateData['MODEL_NAME_CAMEL'] . '->' . $column['field'] . " !!}</td>";
+        }
 
-        // generate files for every table
-        foreach ($this->tables as $idx => $tableName) {
-            if (isset($this->models[$idx])) {
-                $modelName = $this->models[$idx];
-            } else {
-                $modelName = str_singular(studly_case($tableName));
+        $templateData['FIELD_HEADER'] = implode("\n\t\t\t\t", $headerColumns);
+        $templateData['FIELD_BODY'] = implode("\n\t\t\t\t\t", $bodyColumns);
+
+        $filename = 'index.blade.php';
+        $this->generateFile($filename, $templateData, $this->templatePath . 'index.blade');
+    }
+
+    private function generateForm()
+    {
+        $fieldTemplate = $this->getTemplate($this->templatePath . 'form_field.blade');
+
+        $fields = [];
+        logger($this->fillableColumns);
+        foreach ($this->fillableColumns as $column) {
+            switch ($column['type']) {
+                case 'integer':
+                    $inputType = 'number';
+                    break;
+                case 'text':
+                    $inputType = 'textarea';
+                    break;
+                case 'date':
+                    $inputType = $column['type'];
+                    break;
+                case 'boolean':
+                    $inputType = 'checkbox';
+                    break;
+                default:
+                    $inputType = 'text';
+                    break;
             }
 
-            $this->comment('Generating controller for: ' . $tableName);
-
-            $data = array_merge($configData, [
-                'TABLE_NAME' => $tableName,
-                'MODEL_NAME' => $modelName,
-                'MODEL_NAME_CAMEL' => camel_case($modelName),
-                'MODEL_NAME_PLURAL' => str_plural($modelName),
-                'MODEL_NAME_PLURAL_CAMEL' => camel_case(str_plural($modelName)),
-                'RESOURCE_URL' => str_slug($tableName),
-                'VIEW_FOLDER_NAME' => snake_case($tableName),
+            $fields[] = $this->compile($fieldTemplate, [
+                'FIELD_NAME' => $column['field'],
+                'LABEL' => title_case(str_replace('_', ' ', $column['field'])),
+                'INPUT_TYPE' => $inputType,
             ]);
-
-            // create a view folder
-            $viewGenerator->fillableColumns = $modelGenerator->fillableColumns;
-            $viewGenerator->generate($data);
         }
+
+        $templateData = $this->templateData;
+        $templateData['FIELDS'] = implode("\n\n", $fields);
+
+        $filename = 'form.blade.php';
+        $this->generateFile($filename, $templateData, $this->templatePath . 'form.blade');
+    }
+
+    private function generateShow()
+    {
+        $fieldTemplate = $this->getTemplate($this->templatePath . 'form_field.blade');
+
+        $fields = [];
+        foreach ($this->fillableColumns as $column) {
+            $fields[] = $this->compile($fieldTemplate, [
+                'FIELD_NAME' => $column['field'],
+                'LABEL' => title_case(str_replace('_', ' ', $column['field'])),
+            ]);
+        }
+
+        $templateData = $this->templateData;
+        $templateData['FIELDS'] = implode("\n\n", $fields);
+
+        $filename = 'show.blade.php';
+        $this->generateFile($filename, $templateData, $this->templatePath . 'show.blade');
+    }
+
+    private function generateCreate()
+    {
+        $filename = 'create.blade.php';
+        $this->generateFile($filename, $this->templateData, $this->templatePath . 'create.blade');
+    }
+
+    private function generateEdit()
+    {
+        $filename = 'edit.blade.php';
+        $this->generateFile($filename, $this->templateData, $this->templatePath . 'edit.blade');
     }
 }
