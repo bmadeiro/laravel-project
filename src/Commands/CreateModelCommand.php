@@ -12,11 +12,10 @@ class CreateModelCommand extends CreateCommand
      * @var string
      */
     protected $signature = 'create:model
-                            {table?} : Table name for generate model file.}
-                            {--tables= : a single table or a list of tables separated by a comma (,).}
-                            {--ignore= : List ignore table name.}
-                            {--connection= : database connection to use, leave off and it will use the .env connection}
-                            {--soft-deletes=no : Include soft deletes fields.}';
+                            {table?} : Table name for generate model file}
+                            {--tables= : a single table or a list of tables separated by a comma (,)}
+                            {--ignore= : List ignore table name}
+                            {--soft-deletes=no : Include soft deletes fields}';
 
     /**
      * The console command description.

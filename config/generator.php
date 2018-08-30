@@ -30,19 +30,13 @@ return [
     
     'path_model'      => app_path('Models/'),
     
-    'path_repository' => app_path('Repositories/'),
-    
-    'path_service'    => app_path('Services/'),
-    
-    'path_controller' => app_path('Controllers/'),
+    'path_controller' => app_path('Http/Controllers/'),
     
     'path_view'       => base_path('resources/views/'),
     
     'path_request'    => app_path('Requests/'),
     
-    'path_route'      => app_path('routes.php'),
-    
-    'path_factory'    => base_path('database/factories/ModelFactory.php'),
+    'path_route'      => base_path('routes/web.php'),
 
     /*
     |--------------------------------------------------------------------------
@@ -53,15 +47,11 @@ return [
     |
      */
 
-    'namespace_model'      => 'Dais\Models',
+    'namespace_model'      => 'App\Models',
     
-    'namespace_repository' => 'Dais\Repositories',
+    'namespace_controller' => 'App\Http\Controllers',
     
-    'namespace_service'    => 'Dais\Services',
-    
-    'namespace_controller' => 'Dais\Controllers',
-    
-    'namespace_request'    => 'Dais\Requests',
+    'namespace_request'    => 'App\Requests',
 
     /**
      * Columns number to show in view's table.

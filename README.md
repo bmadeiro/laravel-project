@@ -9,7 +9,7 @@ This package provides various initial generators (CRUD, API, Controller, Model, 
 
 ## Requirements
     Laravel >=5.6
-    PHP >= 5.5.9
+    PHP >= "7.1.3"
 
 ## Installation
 ```
@@ -19,10 +19,12 @@ composer require bmadeiro/laravel-project --dev
 ## Documentation
 Go through to the [detailed documentation](doc#readme)
 
-## Authors
+## Credits
+--------
+Original Laravel Generator is created by [Bluecode](https://github.com/matmaxanh).
 
-[Sohel Amin](http://sohelamin.com) :email: [Email Me](mailto:sohelamincse@gmail.com)
-[Bluecode] (https://github.com/matmaxanh)
+[19peaches] (https://github.com/19peaches)
+
 [Bruno Madeiro] :email: [Email Me](mailto:bmadeiro@gmail.com) 
 
 ## License

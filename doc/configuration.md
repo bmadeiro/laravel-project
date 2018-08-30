@@ -1,6 +1,6 @@
 ## Configuration
 
-You will find a configuration file located at `config/crudgenerator.php`
+You will find a configuration file located at `config/generator.php`
 
 ### Custom Template
 

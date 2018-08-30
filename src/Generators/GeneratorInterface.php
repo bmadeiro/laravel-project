@@ -4,7 +4,7 @@ namespace Bmadeiro\LaravelProject\Generators;
 
 interface GeneratorInterface
 {
-    public function getStub();
+    public function getTemplatePath();
 
     public function getType();
 

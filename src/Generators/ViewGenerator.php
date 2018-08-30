@@ -3,18 +3,21 @@
 namespace Bmadeiro\LaravelProject\Commands;
 
 use Bmadeiro\LaravelProject\Generators\ControllerGenerator;
+use Bmadeiro\LaravelProject\Generators\ModelGenerator;
+use Bmadeiro\LaravelProject\Generators\RequestGenerator;
 use Bmadeiro\LaravelProject\Generators\RoutesGenerator;
+use Bmadeiro\LaravelProject\Generators\ViewGenerator;
 
-class CreateControllerCommand extends CreateCommand
+class CreateScaffoldCommand extends CreateCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'create:controller
-                                {table?} : List table name for generate scaffold.}
-                                {--tables= : List table name for generate scaffold.}
+    protected $signature = 'create:scaffold
+                                {table?} : List table name for generate view.}
+                                {--tables= : List table name for generate view.}
                                 {--ignore= : List ignore table name.}
                                 {--paginate=10 : Pagination for index.blade.php}';
 
@@ -23,7 +26,7 @@ class CreateControllerCommand extends CreateCommand
      *
      * @var string
      */
-    protected $description = 'Create a full CRUD for given table with initial views.';
+    protected $description = 'Create a view for given table.';
     /**
      * A list model name for generate
      *
@@ -38,7 +41,7 @@ class CreateControllerCommand extends CreateCommand
      */
     public function getType()
     {
-        return 'controller';
+        return 'view';
     }
 
     /**
@@ -70,9 +73,9 @@ class CreateControllerCommand extends CreateCommand
         ], $configData);
 
         // init generators
-        $routeGenerator = new RoutesGenerator($this);
+        $modelGenerator = new ModelGenerator($this);
 
-        $controllerGenerator = new ControllerGenerator($this);
+        $viewGenerator = new ViewGenerator($this);
 
         // generate files for every table
         foreach ($this->tables as $idx => $tableName) {
@@ -94,11 +97,9 @@ class CreateControllerCommand extends CreateCommand
                 'VIEW_FOLDER_NAME' => snake_case($tableName),
             ]);
 
-            // update route
-            $routeGenerator->generate($data);
-
-            // create a controller
-            $controllerGenerator->generate($data);
+            // create a view folder
+            $viewGenerator->fillableColumns = $modelGenerator->fillableColumns;
+            $viewGenerator->generate($data);
         }
     }
 }

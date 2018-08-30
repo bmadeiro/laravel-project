@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Bmadeiro\LaravelProject\Generators;
 
@@ -12,6 +12,8 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
      * @var array
      */
     private $guardFields = ['created_at', 'updated_at', 'deleted_at', 'remember_token'];
+
+    public $isPivots;
 
     public function __construct($command)
     {
@@ -29,18 +31,6 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
     {
         return 'model';
     }
-    
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getStub()
-    {
-        return config('generator.custom_template')
-        ? config('generator.path') . '/model.stub'
-        : __DIR__ . '/../stubs/model.stub';
-    }
 
     /**
      * Get the template path for generate
@@ -49,7 +39,7 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
      */
     public function getTemplatePath()
     {
-        return 'common/Model';
+        return 'model.stub';
     }
 
     public function getTraitConfig()
@@ -63,17 +53,26 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
 
     public function generate($data = [])
     {
+        $this->isPivots = false;
         $schema = $this->schemaParser->getFields($data['TABLE_NAME']);
 
         if (empty($schema)) {
-            return;
+            return false;
         }
 
         $this->fillableColumns = $this->schemaParser->getFillableFieldsFromSchema($schema);
-        
+
+        $this->isPivots = count($this->schemaParser->checkPivots($data['TABLE_NAME'])) === 2 ? true : false;
+
         $filename = $data['MODEL_NAME'].'.php';
 
         $templateData = $this->getTemplateData($schema, $data);
+
+        $templateData = $this->getExtendsClass('model', $templateData);
+
+        if (!config('generator.pivot_scaffold', false) && $this->isPivots) {
+            return false;
+        }
 
         $this->generateFile($filename, $templateData);
     }
@@ -85,6 +84,14 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
      */
     public function getTemplateData($schema, $data = [])
     {
+        $validations = $this->getValidationRules($data['TABLE_NAME']);
+
+        if ($validations === false) {
+            return false;
+        }
+
+        $data['RULES'] = implode(",\n\t\t", $validations);
+
         $importTraits = $traits = [];
         if (isset($schema['deleted_at']) && $schema['deleted_at']['type'] === 'date') {
             $importTraits[] = $variables['SOFT_DELETE_IMPORT'];
@@ -101,9 +108,6 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
         }
         $data['FIELDS'] = implode(",\n\t\t", $fillableStr);
 
-        $validations = $this->getValidationRules($data['TABLE_NAME']);
-        $data['RULES'] = implode(",\n\t\t", $validations);
-
         $data['CAST'] = implode(",\n\t\t", $this->getCasts());
 
         $functions = $this->relationshipGenerator->getFunctionsFromTable($data['TABLE_NAME']);
@@ -116,8 +120,8 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
     private function getValidationRules($tableName)
     {
         $validations = [];
-
         $foreignKeys = $this->schemaParser->getForeignKeyConstraints($tableName);
+
         $existRules = [];
         foreach ($foreignKeys as $key) {
             if (count($key['field']) > 1) {
@@ -149,6 +153,7 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
                 case 'email':
                 case 'password':
                 case 'date':
+                case 'boolean':
                     $rules[] = $column['type'];
                     break;
             }

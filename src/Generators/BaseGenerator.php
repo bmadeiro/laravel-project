@@ -25,7 +25,7 @@ class BaseGenerator
     /**
      * The parser class.
      *
-     * @var \Peaches\Generator\Parser\SchemaParser
+     * @var \Bmadeiro\LaravelProject\Parser\SchemaParser
      */
     public $schemaParser;
 

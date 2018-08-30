@@ -1,0 +1,46 @@
+<?php 
+
+namespace $NAMESPACE_MODEL$;
+
+$BASE_MODEL$
+$IMPORT_TRAIT$
+class $MODEL_NAME$ $BASE_MODEL_EXTEND$
+{
+    $USE_TRAIT$
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    public $table = "$TABLE_NAME$";
+    
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    public $fillable = [
+        $FIELDS$
+    ];
+
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        $CAST$
+    ];
+
+    /**
+     * The rules that is used to validate.
+     *
+     * @var array
+     */
+    public static $rules = [
+        $RULES$
+    ];
+    $RELATIONSHIPS$
+
+    /* ENDGENERATION */
+}
