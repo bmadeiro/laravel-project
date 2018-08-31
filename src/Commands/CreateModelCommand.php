@@ -13,9 +13,10 @@ class CreateModelCommand extends CreateCommand
      */
     protected $signature = 'create:model
                             {table?} : Table name for generate model file}
-                            {--tables= : a single table or a list of tables separated by a comma (,)}
+                            {--tables= : a single table or a list of tables separated by a comma (,). No spaces}
                             {--ignore= : List ignore table name}
-                            {--soft-deletes=no : Include soft deletes fields}';
+                            {--template=default : Specify a custom template}
+                            {--auth : Use Authenticatable, Authorizable, CanResetPassword trait}';
 
     /**
      * The console command description.
@@ -48,11 +49,11 @@ class CreateModelCommand extends CreateCommand
     public function handle()
     {
         parent::handle();
-
+/*
         if ($this->option('models')) {
             $this->models = explode(',', $this->option('models'));
         }
-
+*/
         // TODO: compare the length option
 
         $this->comment('Generating models for: ' . implode(',', $this->tables));
@@ -71,6 +72,7 @@ class CreateModelCommand extends CreateCommand
             $data = array_merge([
                 'TABLE_NAME' => $tableName,
                 'MODEL_NAME' => $modelName,
+                'TEMPLATE' => ($this->option('template') ? $this->option('template') : config("generator.template")),
             ], $configData);
 
             $modelGenerator->generate($data);

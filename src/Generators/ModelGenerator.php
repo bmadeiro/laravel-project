@@ -11,7 +11,7 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
      *
      * @var array
      */
-    private $guardFields = ['created_at', 'updated_at', 'deleted_at', 'remember_token'];
+    private $guardFields = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token'];
 
     public $isPivots;
 
@@ -42,9 +42,36 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
         return 'model.stub';
     }
 
+    /**
+     * Get thelaravel default stub path for generate
+     *
+     * @return string
+     */
+    public function getLaravelDefaultTemplatePath()
+    {
+        return 'laravel\model.stub';
+    }
+
     public function getTraitConfig()
     {
+        $authImport = [
+            'use Illuminate\Auth\Authenticatable;',
+            'use Illuminate\Auth\Passwords\CanResetPassword;',
+            'use Illuminate\Foundation\Auth\Access\Authorizable;',
+            'use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;',
+            'use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;',
+            'use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;',
+        ];
+
+        $authTrait = ['Authenticatable', 'Authorizable', 'CanResetPassword'];
+
         return [
+            'AUTH_IMPORT' => $authImport,
+
+            'AUTH_TRAIT' => $authTrait,
+
+            'AUTH_IMPLEMENTS' => ' implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract',
+
             'SOFT_DELETE_TRAIT' => 'SoftDeletes',
 
             'SOFT_DELETE_IMPORT' => "use Illuminate\Database\Eloquent\SoftDeletes;",
@@ -56,25 +83,31 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
         $this->isPivots = false;
         $schema = $this->schemaParser->getFields($data['TABLE_NAME']);
 
-        if (empty($schema)) {
-            return false;
-        }
-
-        $this->fillableColumns = $this->schemaParser->getFillableFieldsFromSchema($schema);
-
-        $this->isPivots = count($this->schemaParser->checkPivots($data['TABLE_NAME'])) === 2 ? true : false;
-
         $filename = $data['MODEL_NAME'].'.php';
 
-        $templateData = $this->getTemplateData($schema, $data);
+        if (empty($schema)) {
+            if ($this->command->confirm('Table don\'t exists. Do you wish to continue?')) {
+                $templateData = $this->getLaravelDefaultTemplateData($data);
 
-        $templateData = $this->getExtendsClass('model', $templateData);
+                $this->generateFile($filename, $templateData, $this->getLaravelDefaultTemplatePath());
+            }
+            else
+                return false;
+        } else {
+            $this->fillableColumns = $this->schemaParser->getFillableFieldsFromSchema($schema);
 
-        if (!config('generator.pivot_scaffold', false) && $this->isPivots) {
-            return false;
+            $this->hiddenColumns = $this->schemaParser->getHiddenFieldsFromSchema($schema);
+
+            $this->isPivots = count($this->schemaParser->checkPivots($data['TABLE_NAME'])) === 2 ? true : false;
+
+            $templateData = $this->getTemplateData($schema, $data);
+
+            if (!config('generator.pivot_scaffold', false) && $this->isPivots){
+                return false;
+            }
+
+            $this->generateFile($filename, $templateData, $data['TEMPLATE'] . '/' . $this->getTemplatePath());
         }
-
-        $this->generateFile($filename, $templateData);
     }
 
     /**
@@ -86,20 +119,31 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
     {
         $validations = $this->getValidationRules($data['TABLE_NAME']);
 
-        if ($validations === false) {
+        if($validations === false)
             return false;
-        }
 
         $data['RULES'] = implode(",\n\t\t", $validations);
 
-        $importTraits = $traits = [];
+        $variables = $this->getTraitConfig();
+
+        $importTraits = $traits = $fieldsHidden = [];
         if (isset($schema['deleted_at']) && $schema['deleted_at']['type'] === 'date') {
             $importTraits[] = $variables['SOFT_DELETE_IMPORT'];
             $traits[] = $variables['SOFT_DELETE_TRAIT'];
         }
 
+        if ($this->command->type === 'model' && $this->command->option('auth')) {
+            $importTraits = array_merge($importTraits, $variables['AUTH_IMPORT']);
+            $traits = array_merge($traits, $variables['AUTH_TRAIT']);
+            $data['AUTH_IMPLEMENTS'] = $variables['AUTH_IMPLEMENTS'];
+        } else {
+            $data['AUTH_IMPLEMENTS'] = '';
+        }
+
         $data['IMPORT_TRAIT'] = !empty($importTraits) ? implode(PHP_EOL, $importTraits)."\n" : '';
         $data['USE_TRAIT'] = !empty($traits) ? "use ".implode(", ", $traits).";\n" : '';
+
+        $data['PRIMARY_KEY'] = count($this->schemaParser->getPrimaryKey($data['TABLE_NAME'])) === 1 ? $this->schemaParser->getPrimaryKey($data['TABLE_NAME'])[0] : '';
 
         // generate fillable
         $fillableStr = [];
@@ -108,11 +152,44 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
         }
         $data['FIELDS'] = implode(",\n\t\t", $fillableStr);
 
+        ///generate hidden
+        $hiddenFields = [];
+        foreach ($this->hiddenColumns as $column) {
+            $hiddenFields[] = "'".$column['field']."'";
+        }
+
+        $data['HIDDEN'] = implode(",\n\t\t", $hiddenFields);
+
         $data['CAST'] = implode(",\n\t\t", $this->getCasts());
 
         $functions = $this->relationshipGenerator->getFunctionsFromTable($data['TABLE_NAME']);
         $relationships = implode("\n", $functions);
         $data['RELATIONSHIPS'] = $relationships;
+
+        return $data;
+    }
+
+    /**
+     * Fetch the stub data
+     *
+     * @return array
+     */
+    public function getLaravelDefaultTemplateData($data = [])
+    {
+        $data['IMPORT_TRAIT'] = '';
+        $data['USE_TRAIT'] = '';
+
+        $data['AUTH_IMPLEMENTS'] = '';
+
+        $data['FIELDS'] = "//";
+
+        $data['HIDDEN'] = "//";
+
+        $data['RULES'] = "//";
+
+        $data['CAST'] = "//";
+
+        $data['RELATIONSHIPS'] = "//";
 
         return $data;
     }
@@ -124,7 +201,7 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
 
         $existRules = [];
         foreach ($foreignKeys as $key) {
-            if (count($key['field']) > 1) {
+            if ((is_array($key['field']) ? count($key['field']) : 0) > 1) {
                 continue;
             }
 

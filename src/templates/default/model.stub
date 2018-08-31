@@ -1,19 +1,26 @@
-<?php 
+<?php
 
 namespace $NAMESPACE_MODEL$;
 
-$BASE_MODEL$
+use $NAMESPACE_MODEL_EXTEND$;
 $IMPORT_TRAIT$
-class $MODEL_NAME$ $BASE_MODEL_EXTEND$
+class $MODEL_NAME$ extends Model$AUTH_IMPLEMENTS$
 {
     $USE_TRAIT$
+    /**
+    * The database primary key value.
+    *
+    * @var string
+    */
+    protected $primaryKey = '$PRIMARY_KEY$';
+
     /**
      * The database table used by the model.
      *
      * @var string
      */
     public $table = "$TABLE_NAME$";
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -21,6 +28,15 @@ class $MODEL_NAME$ $BASE_MODEL_EXTEND$
      */
     public $fillable = [
         $FIELDS$
+    ];
+
+    /**
+     * The attributes excluded from the model.
+     *
+     * @var array
+     */
+    public $hidden = [
+        $HIDDEN$
     ];
 
     /**
@@ -41,6 +57,4 @@ class $MODEL_NAME$ $BASE_MODEL_EXTEND$
         $RULES$
     ];
     $RELATIONSHIPS$
-
-    /* ENDGENERATION */
 }

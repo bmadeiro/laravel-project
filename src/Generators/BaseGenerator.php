@@ -37,6 +37,13 @@ class BaseGenerator
     public $fillableColumns = [];
 
     /**
+     * The information of hidden columns in a table
+     *
+     * @var array
+     */
+    public $hiddenColumns = [];
+
+    /**
      * The type of class being generated.
      *
      * @var string
@@ -49,6 +56,13 @@ class BaseGenerator
      * @var string
      */
     public $templatePath;
+
+    /**
+     * The template path.
+     *
+     * @var string
+     */
+    public $laravelDefaultTemplatePath;
 
     /**
      * The root path of class being generated.
@@ -76,6 +90,8 @@ class BaseGenerator
         $this->fileHelper = new Filesystem;
 
         $this->templatePath = $this->getTemplatePath();
+        $this->laravelDefaultTemplatePath = $this->getLaravelDefaultTemplatePath();
+
         $this->type = $this->getType();
 
         $this->rootPath = config('generator.path_' . $this->type);
@@ -104,6 +120,27 @@ class BaseGenerator
 
         if (is_null($templatePath)) {
             $templatePath = $this->templatePath;
+        }
+        $content = $this->generateContent($templatePath, $templateData);
+
+        $this->fileHelper->put($path, $content);
+
+        $this->command->info($filename . ' created successfully.');
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     */
+    public function generateLaravelDefaultFile($filename, $templateData, $templatePath = null)
+    {
+        $this->makeDirectory($this->rootPath);
+
+        $path = $this->rootPath . $filename;
+
+        if (is_null($templatePath)) {
+            $templatePath = $this->laravelDefaultTemplatePath;
         }
         $content = $this->generateContent($templatePath, $templateData);
 
@@ -148,10 +185,10 @@ class BaseGenerator
      */
     protected function getTemplate($templatePath)
     {
-        $path = base_path('resources/generator-templates/' . $templatePath . '.stub');
+        $path = base_path('resources/generator/' . $templatePath);
 
         if (!file_exists($path)) {
-            $path = __DIR__ . '/../../templates/' . $templatePath . '.stub';
+            $path = __DIR__ . '/../../templates/' . $templatePath;
         }
 
         return $this->fileHelper->get($path);

@@ -33,7 +33,6 @@ class LaravelProjectServiceProvider extends ServiceProvider
     public function register()
     {
         $this->commands(
-            'Bmadeiro\LaravelProject\Commands\CreateCommand',
             'Bmadeiro\LaravelProject\Commands\CreateProjectCommand',
             'Bmadeiro\LaravelProject\Commands\CreateControllerCommand',
             'Bmadeiro\LaravelProject\Commands\CreateModelCommand',

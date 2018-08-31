@@ -21,7 +21,7 @@ class ViewGenerator extends BaseGenerator implements GeneratorInterface
      */
     public function getTemplatePath()
     {
-        return 'scaffold/views/';
+        return 'views/';
     }
 
     public function getPaginatePath()

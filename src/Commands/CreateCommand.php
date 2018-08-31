@@ -1,6 +1,6 @@
 <?php
 
-namespace Bmadeiro\Commands;
+namespace Bmadeiro\LaravelProject\Commands;
 
 use DB;
 use Illuminate\Console\Command;
@@ -53,7 +53,7 @@ abstract class CreateCommand extends Command
     public function handle()
     {
         if ($this->argument('table')) {
-            $tables = explode(',', $this->argument('tables'));
+            $tables = explode(',', $this->argument('table'));
         } elseif ($this->option('tables')) {
             $tables = explode(',', $this->option('tables'));
         } else {

@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 namespace $NAMESPACE_MODEL$;
 
-$BASE_MODEL$
+use $NAMESPACE_MODEL_EXTEND$;
 $IMPORT_TRAIT$
-class $MODEL_NAME$ $BASE_MODEL_EXTEND$
+class $MODEL_NAME$ extends Model$AUTH_IMPLEMENTS$
 {
     $USE_TRAIT$
     /**
@@ -13,7 +13,7 @@ class $MODEL_NAME$ $BASE_MODEL_EXTEND$
      * @var string
      */
     public $table = "$TABLE_NAME$";
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -41,6 +41,4 @@ class $MODEL_NAME$ $BASE_MODEL_EXTEND$
         $RULES$
     ];
     $RELATIONSHIPS$
-
-    /* ENDGENERATION */
 }
