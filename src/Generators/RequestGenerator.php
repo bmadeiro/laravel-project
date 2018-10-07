@@ -24,6 +24,16 @@ class RequestGenerator extends BaseGenerator implements GeneratorInterface
         return 'request.stub';
     }
 
+    /**
+     * Get thelaravel default stub path for generate
+     *
+     * @return string
+     */
+    public function getLaravelDefaultTemplatePath()
+    {
+        return 'laravel\request.stub';
+    }
+
     public function generate($data = [])
     {
         $contexts = ['Create', 'Update'];
@@ -34,7 +44,9 @@ class RequestGenerator extends BaseGenerator implements GeneratorInterface
             $templateData['REQUEST_CONTEXT'] = $context;
             $filename =  $context . $data['MODEL_NAME'] . 'Request.php';
 
-            $this->generateFile($filename, $templateData);
+            $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+            $this->generateFile($filename, $templateData, $templateName . '/' . $this->getTemplatePath());
         }
     }
 }

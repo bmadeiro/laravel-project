@@ -245,7 +245,7 @@ class FieldParser
     {
         if (!is_null($args)) {
             $args = $this->argsToString($args, $quotes);
-            return $function . '(' . $args . ')';
+            return 'unsigned()->' . $function . '(' . $args . ')';
         } else {
             return $function;
         }

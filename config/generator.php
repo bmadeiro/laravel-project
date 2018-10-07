@@ -15,7 +15,7 @@ return [
 
     'path' => base_path('resources/generator/'),
 
-    
+
 
     /*
     |--------------------------------------------------------------------------
@@ -27,15 +27,15 @@ return [
      */
 
     'path_migration'  => base_path('database/migrations/'),
-    
+
     'path_model'      => app_path('Models/'),
-    
+
     'path_controller' => app_path('Http/Controllers/'),
-    
+
     'path_view'       => base_path('resources/views/'),
-    
+
     'path_request'    => app_path('Requests/'),
-    
+
     'path_route'      => base_path('routes/web.php'),
 
     /*
@@ -48,61 +48,22 @@ return [
      */
 
     'namespace_model'      => 'App\Models',
-    
+
     'namespace_controller' => 'App\Http\Controllers',
-    
+
     'namespace_request'    => 'App\Requests',
-
-    /**
-     * Columns number to show in view's table.
-     */
-    'view_columns_number' => 3,
-
-    /**
-     * Delimiter for template vars
-     */
-    'custom_delimiter' => ['%%', '%%'],
 
     /*
     |--------------------------------------------------------------------------
-    | Dynamic templating
+    | Message
     |--------------------------------------------------------------------------
-    |
-    | Here you can specify your customs templates for the generator.
-    | You can set new templates or delete some templates if you do not want them.
-    | You can also choose which values are passed to the views and you can specify a custom delimiter for all templates
-    |
-    | Those values are available :
-    |
-    | formFields
-    | formFieldsHtml
-    | varName
-    | crudName
-    | crudNameCap
-    | crudNameSingular
-    | primaryKey
-    | modelName
-    | modelNameCap
-    | viewName
-    | routePrefix
-    | routePrefixCap
-    | routeGroup
-    | formHeadingHtml
-    | formBodyHtml
-    |
-    |
      */
-    'dynamic_view_template' => [
-        'index' => ['formHeadingHtml', 'formBodyHtml', 'crudName', 'crudNameCap', 'modelName', 'viewName', 'routeGroup', 'primaryKey'],
-        'form' => ['formFieldsHtml'],
-        'create' => ['crudName', 'crudNameCap', 'modelName', 'modelNameCap', 'viewName', 'routeGroup', 'viewTemplateDir'],
-        'edit' => ['crudName', 'crudNameSingular', 'crudNameCap', 'modelNameCap', 'modelName', 'viewName', 'routeGroup', 'primaryKey', 'viewTemplateDir'],
-        'show' => ['formHeadingHtml', 'formBodyHtml', 'formBodyHtmlForShowView', 'crudName', 'crudNameSingular', 'crudNameCap', 'modelName', 'viewName', 'routeGroup', 'primaryKey'],
-        /*
-         * Add new stubs templates here if you need to, like action, datatable...
-         * custom_template needs to be activated for this to work
-         */
-    ]
-
-
+    'message' => [
+        'en'  => [
+            'store'     => ':model saved successfully.',
+            'update'    => ':model updated successfully.',
+            'delete'    => ':model deleted successfully.',
+            'not_found' => ':model not found',
+        ],
+    ],
 ];

@@ -1,12 +1,12 @@
-<?php 
+<?php
 
 namespace $NAMESPACE_REQUEST$;
 
 use $NAMESPACE_MODEL$\$MODEL_NAME$;
-$BASE_REQUEST$
+use Illuminate\Foundation\Http\FormRequest;
 
-class $REQUEST_CONTEXT$$MODEL_NAME$Request $BASE_REQUEST_EXTEND$ {
-
+class $REQUEST_CONTEXT$$MODEL_NAME$Request extends FormRequest
+{
 	/**
 	 * Determine if the user is authorized to make this request.
 	 *
@@ -26,6 +26,4 @@ class $REQUEST_CONTEXT$$MODEL_NAME$Request $BASE_REQUEST_EXTEND$ {
 	{
 		return $MODEL_NAME$::$rules;
 	}
-
-	/* ENDGENERATION */
 }

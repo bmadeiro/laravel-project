@@ -19,6 +19,7 @@ class CreateProjectCommand extends CreateCommand
                                 {table?} : List table name for generate scaffold.}
                                 {--tables= : List table name for generate scaffold.}
                                 {--ignore= : List ignore table name.}
+                                {--template= : Specify a custom template}
                                 {--paginate=10 : Pagination for index.blade.php}';
 
     /**

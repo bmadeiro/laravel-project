@@ -12,9 +12,10 @@ class CreateMigrationCommand extends CreateCommand
      * @var string
      */
     protected $signature = 'create:migration
-                            {table?} : List table name for generate migration files.}
-                            {--tables= : List table name for generate migration files.}
-                            {--ignore= : List ignore table name.}';
+                                {table?} : List table name for generate migration files.}
+                                {--tables= : a single table or a list of tables separated by a comma (,). No spaces.}
+                                {--ignore= : List ignore table name.}
+                                {--template= : Specify a custom template}';
 
     /**
      * The console command description.
@@ -45,6 +46,13 @@ class CreateMigrationCommand extends CreateCommand
         $this->comment('Generating migrations for: ' . implode(', ', $this->tables));
 
         $migrationGenerator = new MigrationGenerator($this);
-        $migrationGenerator->generate();
+
+        foreach ($this->tables as $tableName) {
+            $data = [
+                'TABLE_NAME' => $tableName,
+            ];
+
+            $migrationGenerator->generate($data);
+        }
     }
 }

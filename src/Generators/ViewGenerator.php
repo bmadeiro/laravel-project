@@ -2,6 +2,8 @@
 
 namespace Bmadeiro\LaravelProject\Generators;
 
+use Bmadeiro\LaravelProject\Parser\SchemaParser;
+
 class ViewGenerator extends BaseGenerator implements GeneratorInterface
 {
     /**
@@ -24,13 +26,29 @@ class ViewGenerator extends BaseGenerator implements GeneratorInterface
         return 'views/';
     }
 
+    /**
+     * Get thelaravel default stub path for generate
+     *
+     * @return string
+     */
+    public function getLaravelDefaultTemplatePath()
+    {
+        return 'laravel/views/';
+    }
+
     public function getPaginatePath()
     {
-        return $this->templatePath . 'paginate.blade';
+        return $this->templatePath . 'paginate.blade.stub';
     }
 
     public function generate($data = [])
     {
+        $this->schemaParser = new SchemaParser();
+
+        $schema = $this->schemaParser->getFields($data['TABLE_NAME']);
+
+        $this->fillableColumns = $this->schemaParser->getFillableFieldsFromSchema($schema);
+
         // set path to view folder
         $this->rootPath = config('generator.path_view') . $data['VIEW_FOLDER_NAME'] . '/';
 
@@ -49,7 +67,9 @@ class ViewGenerator extends BaseGenerator implements GeneratorInterface
         $templateData = $this->templateData;
 
         if ($this->command->option('paginate')) {
-            $templateData['PAGINATE'] = $this->generateContent($this->getPaginatePath(), $templateData);
+            $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+            $templateData['PAGINATE'] = $this->generateContent($templateName . '/' . $this->getPaginatePath(), $templateData);
         } else {
             $templateData['PAGINATE'] = '';
         }
@@ -65,12 +85,17 @@ class ViewGenerator extends BaseGenerator implements GeneratorInterface
         $templateData['FIELD_BODY'] = implode("\n\t\t\t\t\t", $bodyColumns);
 
         $filename = 'index.blade.php';
-        $this->generateFile($filename, $templateData, $this->templatePath . 'index.blade');
+
+        $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+        $this->generateFile($filename, $templateData, $templateName . '/' . $this->templatePath . 'index.blade.stub');
     }
 
     private function generateForm()
     {
-        $fieldTemplate = $this->getTemplate($this->templatePath . 'form_field.blade');
+        $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+        $fieldTemplate = $this->getTemplate($templateName . '/' . $this->templatePath . 'form_field.blade.stub');
 
         $fields = [];
         logger($this->fillableColumns);
@@ -104,12 +129,15 @@ class ViewGenerator extends BaseGenerator implements GeneratorInterface
         $templateData['FIELDS'] = implode("\n\n", $fields);
 
         $filename = 'form.blade.php';
-        $this->generateFile($filename, $templateData, $this->templatePath . 'form.blade');
+
+        $this->generateFile($filename, $templateData, $templateName . '/' . $this->templatePath . 'form.blade.stub');
     }
 
     private function generateShow()
     {
-        $fieldTemplate = $this->getTemplate($this->templatePath . 'form_field.blade');
+        $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+        $fieldTemplate = $this->getTemplate($templateName . '/' . $this->templatePath . 'form_field.blade.stub');
 
         $fields = [];
         foreach ($this->fillableColumns as $column) {
@@ -123,18 +151,25 @@ class ViewGenerator extends BaseGenerator implements GeneratorInterface
         $templateData['FIELDS'] = implode("\n\n", $fields);
 
         $filename = 'show.blade.php';
-        $this->generateFile($filename, $templateData, $this->templatePath . 'show.blade');
+
+        $this->generateFile($filename, $templateData, $templateName . '/' . $this->templatePath . 'show.blade.stub');
     }
 
     private function generateCreate()
     {
         $filename = 'create.blade.php';
-        $this->generateFile($filename, $this->templateData, $this->templatePath . 'create.blade');
+
+        $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+        $this->generateFile($filename, $this->templateData, $templateName . '/' . $this->templatePath . 'create.blade.stub');
     }
 
     private function generateEdit()
     {
         $filename = 'edit.blade.php';
-        $this->generateFile($filename, $this->templateData, $this->templatePath . 'edit.blade');
+
+        $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+        $this->generateFile($filename, $this->templateData, $templateName . '/' . $this->templatePath . 'edit.blade.stub');
     }
 }

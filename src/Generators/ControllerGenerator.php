@@ -21,23 +21,21 @@ class ControllerGenerator extends BaseGenerator implements GeneratorInterface
      */
     public function getTemplatePath()
     {
-        // get template filename
-        $useRepositoryLayer = config('generator.use_repository_layer', false);
-        $useServiceLayer = config('generator.use_service_layer', false);
+        return 'controller.stub';
+    }
 
-        if ($useServiceLayer && $useRepositoryLayer) {
-            $templateFilename = 'Controller_Service';
-        } elseif ($useRepositoryLayer) {
-            $templateFilename = 'Controller_Repository';
-        } else {
-            $templateFilename = 'Controller_Request';
-        }
-        return 'scaffold/' . $templateFilename;
+    /**
+     * Get thelaravel default stub path for generate
+     *
+     * @return string
+     */
+    public function getLaravelDefaultTemplatePath()
+    {
+        return 'laravel\model.stub';
     }
 
     public function generate($data = [])
     {
-
         if ($this->command->option('paginate')) {
             $data['RENDER_TYPE'] = 'paginate(' . $this->command->option('paginate') . ')';
         } else {
@@ -48,7 +46,9 @@ class ControllerGenerator extends BaseGenerator implements GeneratorInterface
 
         $templateData = $this->getExtendsClass('controller',$data);
 
-        $this->generateFile($filename, $templateData);
+        $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+        $this->generateFile($filename, $templateData, $templateName . '/' . $this->getTemplatePath());
     }
 
     public function requestLayer($configData, $modelName, $useRequestLayer = false)

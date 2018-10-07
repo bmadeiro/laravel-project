@@ -3,6 +3,7 @@
 namespace Bmadeiro\LaravelProject\Commands;
 
 use Bmadeiro\LaravelProject\Generators\ControllerGenerator;
+use Bmadeiro\LaravelProject\Generators\RequestGenerator;
 use Bmadeiro\LaravelProject\Generators\RoutesGenerator;
 
 class CreateControllerCommand extends CreateCommand
@@ -14,8 +15,9 @@ class CreateControllerCommand extends CreateCommand
      */
     protected $signature = 'create:controller
                                 {table?} : List table name for generate scaffold.}
-                                {--tables= : List table name for generate scaffold.}
+                                {--tables= : a single table or a list of tables separated by a comma (,). No spaces.}
                                 {--ignore= : List ignore table name.}
+                                {--template= : Specify a custom template}
                                 {--paginate=10 : Pagination for index.blade.php}';
 
     /**
@@ -23,7 +25,7 @@ class CreateControllerCommand extends CreateCommand
      *
      * @var string
      */
-    protected $description = 'Create a full CRUD for given table with initial views.';
+    protected $description = 'Create a controller for given table.';
     /**
      * A list model name for generate
      *
@@ -62,6 +64,7 @@ class CreateControllerCommand extends CreateCommand
         } else {
             $messages = $configMessages['en'];
         }
+        //dd($messages);
         $configData = array_merge([
             'MESSAGE_STORE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['store']) . "'",
             'MESSAGE_UPDATE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['update']) . "'",
@@ -71,6 +74,8 @@ class CreateControllerCommand extends CreateCommand
 
         // init generators
         $routeGenerator = new RoutesGenerator($this);
+
+        $requestGenerator = new RequestGenerator($this);
 
         $controllerGenerator = new ControllerGenerator($this);
 
@@ -96,6 +101,9 @@ class CreateControllerCommand extends CreateCommand
 
             // update route
             $routeGenerator->generate($data);
+
+            // create request files
+            $requestGenerator->generate($data);
 
             // create a controller
             $controllerGenerator->generate($data);

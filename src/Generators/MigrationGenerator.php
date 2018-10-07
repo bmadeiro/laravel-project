@@ -9,12 +9,6 @@ use Bmadeiro\LaravelProject\Syntax\RemoveForeignKeysFromTable;
 
 class MigrationGenerator extends BaseGenerator implements GeneratorInterface
 {
-    /**
-     * Filename date prefix (Y_m_d_His)
-     * @var string
-     */
-    public $datePrefix;
-
     public function __construct($command)
     {
         parent::__construct($command);
@@ -38,60 +32,70 @@ class MigrationGenerator extends BaseGenerator implements GeneratorInterface
      */
     public function getTemplatePath()
     {
-        return 'common/Migration';
+        return 'migration.stub';
+    }
+
+    /**
+     * Get thelaravel default stub path for generate
+     *
+     * @return string
+     */
+    public function getLaravelDefaultTemplatePath()
+    {
+        return 'laravel\migration.stub';
     }
 
     public function generate($data = [])
     {
-        $this->datePrefix = date('Y_m_d_His');
-        $this->generateMigrationFile('create', $this->command->tables);
+        $schema = $this->schemaParser->getFields($data['TABLE_NAME']);
 
-        $this->command->info("\nSetting up Foreign Key Migrations\n");
-        $this->templatePath = 'common/Migration_ForeignKey';
-        $this->datePrefix = date('Y_m_d_His', strtotime('+1 second'));
-        $this->generateMigrationFile('foreign_keys', $this->command->tables);
-    }
+        $migrationName = 'create_' . $data['TABLE_NAME'] . '_table';
 
-    /**
-     * Generate Migrations
-     *
-     * @param  string $method Create Tables or Foreign Keys ['create', 'foreign_keys']
-     * @param  array  $tables List of tables to create migrations for
-     * @throws MethodNotFoundException
-     * @return void
-     */
-    public function generateMigrationFile($method, $tables)
-    {
-        if ($method == 'create') {
-            $function = 'getFields';
-            $prefix = 'create';
-        } elseif ($method = 'foreign_keys') {
-            $function = 'getForeignKeyConstraints';
-            $prefix = 'add_foreign_keys_to';
-            $method = 'table';
+        $filename = date('Y_m_d_His') . '_' . $migrationName . '.php';
+
+        $data = array_merge([
+            'CLASS' => ucwords(camel_case($migrationName)),
+            'TABLE' => $data['TABLE_NAME'],
+            'METHOD' => 'create',
+        ], $data);
+
+        if (empty($schema)) {
+            if ($this->command->confirm('Table ' . $data['TABLE_NAME'] . ' don\'t exists. Do you wish to continue?')) {
+
+                $templateData = $this->getLaravelDefaultTemplateData($data);
+
+                $this->generateFile($filename, $templateData, $this->getLaravelDefaultTemplatePath());
+            }
+            else
+                return;
         } else {
-            return;
-        }
 
-        $this->method = $method;
-        foreach ($tables as $table) {
-            $migrationName = $prefix . '_' . $table . '_table';
+            $templateData = $this->getTemplateData($schema, $data);
 
-            $fields = $this->schemaParser->{$function}($table);
+            $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
 
-            if (empty($fields)) {
-                continue;
+            $this->generateFile($filename, $templateData, $templateName . '/' . $this->getTemplatePath());
+
+            $schema = $this->schemaParser->getForeignKeyConstraints($data['TABLE_NAME']);
+
+            if (empty($schema)) {
+                return;
             }
 
-            $filename = $this->datePrefix . '_' . $migrationName . '.php';
+            $this->command->info("\nSetting up Foreign Key Migrations for table " . $data['TABLE_NAME'] . "\n");
 
-            $templateData = $this->getTemplateData($fields, [
-                'CLASS' => ucwords(camel_case($migrationName)),
-                'TABLE' => $table,
-                'METHOD' => $method,
-            ]);
+            $migrationName = 'add_foreign_keys_to_' . $data['TABLE_NAME'] . '_table';
 
-            $this->generateFile($filename, $templateData);
+            $filename = date('Y_m_d_His', strtotime('+1 second')) . '_' . $migrationName . '.php';
+
+            //Change method type from $data array
+            $data['METHOD'] = 'table';
+
+            $templateData = $this->getTemplateData($schema, $data);
+
+            $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+            $this->generateFile($filename, $templateData, $templateName . '/migration_ForeignKey.stub');
         }
     }
 
@@ -113,6 +117,19 @@ class MigrationGenerator extends BaseGenerator implements GeneratorInterface
         return array_merge($data, [
             'UP' => $up,
             'DOWN' => $down,
+        ]);
+    }
+
+    /**
+     * Fetch the stub data
+     *
+     * @return array
+     */
+    public function getLaravelDefaultTemplateData($data = [])
+    {
+        return array_merge($data, [
+            'UP' => '',
+            'DOWN' => '',
         ]);
     }
 }

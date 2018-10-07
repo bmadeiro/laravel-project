@@ -1,11 +1,11 @@
 <?php
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class $CLASS$ extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,11 +25,7 @@ class $CLASS$ extends Migration
      */
     public function down()
     {
-        Schema::$METHOD$('$TABLE$', function(Blueprint $table)
-        {
-            $DOWN$
-        });
+        Schema::drop('$TABLE$');
     }
 
-    /* ENDGENERATION */
 }

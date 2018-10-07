@@ -1,15 +1,17 @@
-<?php 
+<?php
 
 namespace $NAMESPACE_CONTROLLER$;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Flash;
-$USE_REQUEST$
+use $NAMESPACE_REQUEST$;
 use $NAMESPACE_MODEL$\$MODEL_NAME$;
-$BASE_CONTROLLER$
+use $NAMESPACE_REQUEST$\Create$MODEL_NAME$Request;
+use $NAMESPACE_REQUEST$\Update$MODEL_NAME$Request;
+use $BASE_CONTROLLER$ as BaseController;
 
-class $MODEL_NAME$Controller $BASE_CONTROLLER_EXTEND$
+class $MODEL_NAME$Controller extends BaseController
 {
 
     /**
@@ -41,14 +43,14 @@ class $MODEL_NAME$Controller $BASE_CONTROLLER_EXTEND$
      *
      * @return Response
      */
-    public function store($CREATE_REQUEST$ $request)
+    public function store(Create$MODEL_NAME$Request $request)
     {
         $input = $request->all();
 
         $MODEL_NAME$::create($input);
-        
+
         Flash::success($MESSAGE_STORE$);
-        
+
         return redirect(route('$ROUTE_PREFIX$$RESOURCE_URL$.index'));
     }
 
@@ -62,7 +64,7 @@ class $MODEL_NAME$Controller $BASE_CONTROLLER_EXTEND$
     public function show($id)
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
-        
+
         return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.show')->with(compact('$MODEL_NAME_CAMEL$'));
     }
 
@@ -76,7 +78,7 @@ class $MODEL_NAME$Controller $BASE_CONTROLLER_EXTEND$
     public function edit($id)
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
-        
+
         return view('$VIEW_PATH$$VIEW_FOLDER_NAME$.edit')->with(compact('$MODEL_NAME_CAMEL$'));
     }
 
@@ -88,7 +90,7 @@ class $MODEL_NAME$Controller $BASE_CONTROLLER_EXTEND$
      *
      * @return Response
      */
-     public function update($id, $UPDATE_REQUEST$ $request)
+    public function update($id, Update$MODEL_NAME$Request $request)
     {
         $$MODEL_NAME_CAMEL$ = $this->exist($id);
 
@@ -137,6 +139,4 @@ class $MODEL_NAME$Controller $BASE_CONTROLLER_EXTEND$
 
         return $$MODEL_NAME_CAMEL$;
     }
-
-    /* ENDGENERATION */
 }

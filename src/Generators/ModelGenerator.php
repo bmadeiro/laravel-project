@@ -81,12 +81,13 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
     public function generate($data = [])
     {
         $this->isPivots = false;
+
         $schema = $this->schemaParser->getFields($data['TABLE_NAME']);
 
         $filename = $data['MODEL_NAME'].'.php';
 
         if (empty($schema)) {
-            if ($this->command->confirm('Table don\'t exists. Do you wish to continue?')) {
+            if ($this->command->confirm('Table ' . $data['TABLE_NAME'] . ' don\'t exists. Do you wish to continue?')) {
                 $templateData = $this->getLaravelDefaultTemplateData($data);
 
                 $this->generateFile($filename, $templateData, $this->getLaravelDefaultTemplatePath());
@@ -106,7 +107,9 @@ class ModelGenerator extends BaseGenerator implements GeneratorInterface
                 return false;
             }
 
-            $this->generateFile($filename, $templateData, $data['TEMPLATE'] . '/' . $this->getTemplatePath());
+            $templateName = ($this->command->option('template') ? $this->command->option('template') : config("generator.template"));
+
+            $this->generateFile($filename, $templateData, $templateName . '/' . $this->getTemplatePath());
         }
     }
 

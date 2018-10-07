@@ -52,10 +52,13 @@ abstract class CreateCommand extends Command
      */
     public function handle()
     {
+        //Argument table
         if ($this->argument('table')) {
             $tables = explode(',', $this->argument('table'));
+        //List of tables separated by a comma (,)
         } elseif ($this->option('tables')) {
             $tables = explode(',', $this->option('tables'));
+        //All tables
         } else {
             $tables = DB::getDoctrineConnection()->getSchemaManager()->listTableNames();
         }
@@ -119,7 +122,7 @@ abstract class CreateCommand extends Command
         }
 
         return [
-            'BASE_CONTROLLER' => config('generator.base_controller', 'App\Base\Controller'),
+            'BASE_CONTROLLER' => config('generator.base_controller', 'App\Http\Controllers\Controller'),
 
             'BASE_NAME' => config('generator.base_name', 'App\Base'),
 
@@ -129,13 +132,9 @@ abstract class CreateCommand extends Command
 
             'NAMESPACE_CONTROLLER' => config('generator.namespace_controller', 'App\Controllers'),
 
-            'NAMESPACE_REQUEST' => config('generator.namespace_request', 'App\Requests'),
+            'NAMESPACE_REQUEST' => config('generator.namespace_request', 'App\Http\Requests'),
 
-            'NAMESPACE_REPOSITORY' => config('generator.namespace_repository', 'App\Repositories'),
-
-            'NAMESPACE_SERVICE' => config('generator.namespace_service', 'App\Services'),
-
-            'MAIN_LAYOUT' => config('generator.main_layout', 'layout.app'),
+            'MAIN_LAYOUT' => config('generator.main_layout', 'layouts.app'),
 
             'VIEW_PATH' => $viewPath,
 

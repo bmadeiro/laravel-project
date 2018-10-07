@@ -1,0 +1,1 @@
+Route::resource('$RESOURCE_URL$', '$MODEL_NAME$Controller');

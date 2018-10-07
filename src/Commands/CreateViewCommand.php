@@ -14,8 +14,9 @@ class CreateViewCommand extends CreateCommand
      */
     protected $signature = 'create:view
                                 {table?} : List table name for generate view.}
-                                {--tables= : List table name for generate view.}
+                                {--tables= : a single table or a list of tables separated by a comma (,). No spaces.}
                                 {--ignore= : List ignore table name.}
+                                {--template= : Specify a custom template}
                                 {--paginate=10 : Pagination for index.blade.php}';
 
     /**
@@ -62,16 +63,8 @@ class CreateViewCommand extends CreateCommand
         } else {
             $messages = $configMessages['en'];
         }
-        $configData = array_merge([
-            'MESSAGE_STORE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['store']) . "'",
-            'MESSAGE_UPDATE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['update']) . "'",
-            'MESSAGE_DELETE' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['delete']) . "'",
-            'MESSAGE_NOT_FOUND' => "'" . str_replace(':model', '$MODEL_NAME$', $messages['not_found']) . "'",
-        ], $configData);
 
         // init generators
-        $modelGenerator = new ModelGenerator($this);
-
         $viewGenerator = new ViewGenerator($this);
 
         // generate files for every table
@@ -93,9 +86,8 @@ class CreateViewCommand extends CreateCommand
                 'RESOURCE_URL' => str_slug($tableName),
                 'VIEW_FOLDER_NAME' => snake_case($tableName),
             ]);
-        
+
             // create a view folder
-            $viewGenerator->fillableColumns = $modelGenerator->fillableColumns;
             $viewGenerator->generate($data);
         }
     }

@@ -209,4 +209,32 @@ class BaseGenerator
         }
         return $template;
     }
+
+    /**
+     * Format generator
+     * @param $type
+     * @param $data
+     * @return array
+     */
+    public function getExtendsClass($type, $data)
+    {
+        $CapsType = strtoupper($type);
+        $baseClass = 'use ' . config("generator.base_{$type}");
+        if (config("generator.base_{$type}_as") !=='')
+        {
+            $baseClass .= ' as ' . config("generator.base_{$type}_as") . ';';
+            $extends = config("generator.base_{$type}_as");
+        }
+        else
+        {
+            $baseClass .= ';';
+            $extends = explode('\\', config("generator.base_{$type}"));
+            $extends = array_pop($extends);
+        }
+        return array_merge([
+            "NAMESPACE_{$CapsType}" => config("generator.namespace_{$type}"),
+            "BASE_{$CapsType}" => $baseClass,
+            "BASE_{$CapsType}_EXTEND" => 'extends ' . $extends,
+        ], $data);
+    }
 }
