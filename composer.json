@@ -26,7 +26,6 @@
         "php": ">=7.0.0",
         "laravel/framework": "5.5.*",
         "doctrine/dbal": "^2.5",
-        "laracasts/flash": "dev-master",
         "laravelcollective/html": "^5.2"
     },
     "require-dev": {
