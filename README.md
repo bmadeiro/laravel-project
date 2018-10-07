@@ -8,8 +8,8 @@
 This package provides various initial generators (CRUD, API, Controller, Model, Migration, View) for Laravel projects from existed tables.
 
 ## Requirements
-    Laravel >=5.6
-    PHP >= "7.1.3"
+    Laravel >=5.5
+    PHP >= "7.0.0"
 
 ## Installation
 ```
